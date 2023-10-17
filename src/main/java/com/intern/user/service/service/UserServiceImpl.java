@@ -717,7 +717,7 @@ public class UserServiceImpl implements UserService {
 		newStudentEntity.setStudentCourse(studentRequest.getStudentCourse());
 		newStudentEntity.setStudentClass(studentRequest.getStudentClass());
 		newStudentEntity.setStudentProject(studentRequest.getStudentProject());
-		newStudentEntity.setStudentStatus(studentRequest.getStudentStatus());
+		newStudentEntity.setStudentStatus(existedStudentEntity.getStudentStatus());
 		
 		if (cvFile != null) {
 			newStudentEntity.setStudentCV(cvFile.getBytes());
@@ -812,7 +812,7 @@ public class UserServiceImpl implements UserService {
 			existedStudentEntity.setStudentCourse(studentRequest.getStudentCourse());
 			existedStudentEntity.setStudentClass(studentRequest.getStudentClass());
 			existedStudentEntity.setStudentProject(studentRequest.getStudentProject());
-			existedStudentEntity.setStudentStatus(studentRequest.getStudentStatus());
+//			existedStudentEntity.setStudentStatus(studentRequest.getStudentStatus());
 			
 			if (cvFile != null) {
 				existedStudentEntity.setStudentCV(cvFile.getBytes());
