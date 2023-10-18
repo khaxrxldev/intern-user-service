@@ -57,6 +57,8 @@ public class StudentResponse {
 	private String coordinatorId;
 	
 	private List<String> evaluationIds;
+	
+	private List<StudentSemesterResponse> studentSemesters;
 
 	public String getStudentMatricNum() {
 		return studentMatricNum;
@@ -272,5 +274,13 @@ public class StudentResponse {
 
 	public void setEvaluationIds(List<String> evaluationIds) {
 		this.evaluationIds = evaluationIds;
+	}
+
+	public List<StudentSemesterResponse> getStudentSemesters() {
+		return studentSemesters;
+	}
+
+	public void setStudentSemesters(List<StudentSemesterResponse> studentSemesters) {
+		this.studentSemesters = studentSemesters;
 	}
 }

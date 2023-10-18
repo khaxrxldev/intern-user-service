@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.intern.user.service.dto.SemesterResponse;
+import com.intern.user.service.entity.SemesterEntity;
 import com.intern.user.service.dao.AcademicSupervisorRepository;
 import com.intern.user.service.dao.CompanyRepository;
 import com.intern.user.service.dao.IndustrySupervisorRepository;
+import com.intern.user.service.dao.SemesterRepository;
 import com.intern.user.service.dao.StudentEvaluationRepository;
 import com.intern.user.service.dao.StudentRepository;
+import com.intern.user.service.dao.StudentSemesterRepository;
 import com.intern.user.service.dto.AcademicSupervisorRequest;
 import com.intern.user.service.dto.AcademicSupervisorResponse;
 import com.intern.user.service.dto.CompanyResponse;
@@ -24,12 +28,15 @@ import com.intern.user.service.dto.SigninRequest;
 import com.intern.user.service.dto.SigninResponse;
 import com.intern.user.service.dto.StudentRequest;
 import com.intern.user.service.dto.StudentResponse;
+import com.intern.user.service.dto.StudentSemesterResponse;
 import com.intern.user.service.entity.AcademicSupervisorEntity;
 import com.intern.user.service.entity.CompanyEntity;
 import com.intern.user.service.entity.IndustrySupervisorEntity;
 import com.intern.user.service.entity.StudentEntity;
 import com.intern.user.service.entity.StudentEvaluationEntity;
+import com.intern.user.service.entity.StudentSemesterEntity;
 import com.intern.user.service.utility.BaseUtility;
+import com.intern.user.service.utility.DateUtility;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -44,10 +51,16 @@ public class UserServiceImpl implements UserService {
 	StudentRepository studentRepository;
 	
 	@Autowired
+	CompanyRepository companyRepository;
+	
+	@Autowired
 	StudentEvaluationRepository studentEvaluationRepository;
 	
 	@Autowired
-	CompanyRepository companyRepository;
+	SemesterRepository semesterRepository;
+	
+	@Autowired
+	StudentSemesterRepository studentSemesterRepository;
 
 	@Override
 	public SigninResponse userSignin(SigninRequest signinRequest) {
@@ -581,6 +594,39 @@ public class UserServiceImpl implements UserService {
 				}
 			}
 			
+			List<StudentSemesterResponse> studentSemesterResponses = new ArrayList<StudentSemesterResponse>();
+			List<StudentSemesterEntity> existedStudentSemesterEntities = studentSemesterRepository.findByStudentMatricNum(studentEntity.getStudentMatricNum());
+			
+			for (StudentSemesterEntity existedStudentSemesterEntity : existedStudentSemesterEntities) {
+				StudentSemesterResponse studentSemesterResponse = new StudentSemesterResponse();
+				
+				studentSemesterResponse.setStudentSemesterId(existedStudentSemesterEntity.getStudentSemesterId());
+				studentSemesterResponse.setStudentMatricNum(existedStudentSemesterEntity.getStudentMatricNum());
+				studentSemesterResponse.setSemesterId(existedStudentSemesterEntity.getSemesterId());
+				
+				if (BaseUtility.isNotBlank(existedStudentSemesterEntity.getSemesterId())) {
+					SemesterEntity existedSemesterEntity = semesterRepository.findBySemesterId(existedStudentSemesterEntity.getSemesterId());
+					
+					if (BaseUtility.isObjectNotNull(existedSemesterEntity)) {
+						SemesterResponse semesterResponse = new SemesterResponse();
+						
+						semesterResponse.setSemesterId(existedSemesterEntity.getSemesterId());
+						semesterResponse.setSemesterCode(existedSemesterEntity.getSemesterCode());
+						semesterResponse.setSemesterPart(existedSemesterEntity.getSemesterPart());
+						semesterResponse.setSemesterStatus(existedSemesterEntity.getSemesterStatus());
+//						semesterResponse.setSemesterStartDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterStartDate()));
+//						semesterResponse.setSemesterEndDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterEndDate()));
+						semesterResponse.setSemesterStartEvaluateDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterStartEvaluateDate()));
+						semesterResponse.setSemesterEndEvaluateDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterEndEvaluateDate()));
+						
+						studentSemesterResponse.setSemester(semesterResponse);
+					}
+				}
+				studentSemesterResponses.add(studentSemesterResponse);
+			}
+			
+			studentResponse.setStudentSemesters(studentSemesterResponses);
+			
 			Boolean addRow = true;
 			
 			if (BaseUtility.isNotBlank(studentRequest.getStudentCampus()) && !studentRequest.getStudentCampus().equals(studentEntity.getStudentCampus())) {
@@ -624,13 +670,17 @@ public class UserServiceImpl implements UserService {
 					
 					if (BaseUtility.isObjectNotNull(existedIndustrySupervisorEntity)) {
 						if (existedIndustrySupervisorEntity.getCompanyId().equals(companyEntity.getCompanyId())) {
-							switch (studentEntity.getStudentStatus()) {
-							case "ONG":
-								totalOngoingStatus++;
-								break;
-							case "CMP":
-								totalCompletedStatus++;
-								break;
+							if (BaseUtility.isNotBlank(studentEntity.getStudentStatus())) {
+								switch (studentEntity.getStudentStatus()) {
+								case "ONG":
+									totalOngoingStatus++;
+									break;
+								case "CMP":
+									totalCompletedStatus++;
+									break;
+								default:
+									break;
+								}
 							}
 						}
 					}
@@ -695,6 +745,39 @@ public class UserServiceImpl implements UserService {
 				studentResponse.setIndustrySv(getIndustrySupervisorByIndustrySvId(existedStudentEntity.getIndustrySvId()));
 			}
 			
+			List<StudentSemesterResponse> studentSemesterResponses = new ArrayList<StudentSemesterResponse>();
+			List<StudentSemesterEntity> existedStudentSemesterEntities = studentSemesterRepository.findByStudentMatricNum(existedStudentEntity.getStudentMatricNum());
+			
+			for (StudentSemesterEntity existedStudentSemesterEntity : existedStudentSemesterEntities) {
+				StudentSemesterResponse studentSemesterResponse = new StudentSemesterResponse();
+				
+				studentSemesterResponse.setStudentSemesterId(existedStudentSemesterEntity.getStudentSemesterId());
+				studentSemesterResponse.setStudentMatricNum(existedStudentSemesterEntity.getStudentMatricNum());
+				studentSemesterResponse.setSemesterId(existedStudentSemesterEntity.getSemesterId());
+				
+				if (BaseUtility.isNotBlank(existedStudentSemesterEntity.getSemesterId())) {
+					SemesterEntity existedSemesterEntity = semesterRepository.findBySemesterId(existedStudentSemesterEntity.getSemesterId());
+					
+					if (BaseUtility.isObjectNotNull(existedSemesterEntity)) {
+						SemesterResponse semesterResponse = new SemesterResponse();
+						
+						semesterResponse.setSemesterId(existedSemesterEntity.getSemesterId());
+						semesterResponse.setSemesterCode(existedSemesterEntity.getSemesterCode());
+						semesterResponse.setSemesterPart(existedSemesterEntity.getSemesterPart());
+						semesterResponse.setSemesterStatus(existedSemesterEntity.getSemesterStatus());
+//						semesterResponse.setSemesterStartDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterStartDate()));
+//						semesterResponse.setSemesterEndDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterEndDate()));
+						semesterResponse.setSemesterStartEvaluateDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterStartEvaluateDate()));
+						semesterResponse.setSemesterEndEvaluateDate(DateUtility.convertToLocalDateTime(existedSemesterEntity.getSemesterEndEvaluateDate()));
+						
+						studentSemesterResponse.setSemester(semesterResponse);
+					}
+				}
+				studentSemesterResponses.add(studentSemesterResponse);
+			}
+			
+			studentResponse.setStudentSemesters(studentSemesterResponses);
+			
 			return studentResponse;
 		} else {
 			return null;
@@ -717,7 +800,9 @@ public class UserServiceImpl implements UserService {
 		newStudentEntity.setStudentCourse(studentRequest.getStudentCourse());
 		newStudentEntity.setStudentClass(studentRequest.getStudentClass());
 		newStudentEntity.setStudentProject(studentRequest.getStudentProject());
-		newStudentEntity.setStudentStatus(existedStudentEntity.getStudentStatus());
+		if (BaseUtility.isObjectNotNull(existedStudentEntity)) {
+			newStudentEntity.setStudentStatus(existedStudentEntity.getStudentStatus());
+		}
 		
 		if (cvFile != null) {
 			newStudentEntity.setStudentCV(cvFile.getBytes());
