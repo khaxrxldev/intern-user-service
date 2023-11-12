@@ -62,7 +62,7 @@ public class UserControllerReactive {
 	}
 	
 	@GetMapping("/student/{studentMatricNum}")
-	public ResponseEntity<Response> getStudentByStudentMatricNum(@PathVariable("studentMatricNum") String studentMatricNum) {
+	public ResponseEntity<Response> getStudentByStudentMatricNum(@PathVariable("studentMatricNum") String studentMatricNum) throws Exception {
 		HttpStatus http_status = HttpStatus.OK;
 		String error_desc = null;
 		Boolean message_status = false;

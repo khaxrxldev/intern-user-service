@@ -51,7 +51,7 @@ public interface UserService {
 	
 	List<List<String>> getTotalStudents();
 	
-	StudentResponse getStudentByStudentMatricNum(String studentMatricNum);
+	StudentResponse getStudentByStudentMatricNum(String studentMatricNum) throws Exception;
 	
 	StudentResponse insertStudent(StudentRequest studentRequest, MultipartFile cvFile, MultipartFile mtFile, MultipartFile clFile, MultipartFile coFile, MultipartFile slFile) throws Exception;
 	
