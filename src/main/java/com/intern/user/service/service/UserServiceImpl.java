@@ -188,7 +188,7 @@ public class UserServiceImpl implements UserService {
 		AcademicSupervisorResponse academicSupervisorResponse = null;
 		AcademicSupervisorEntity newAcademicSupervisorEntity = new AcademicSupervisorEntity();
 		
-		newAcademicSupervisorEntity.setAcademicSvId(BaseUtility.generateId());
+		newAcademicSupervisorEntity.setAcademicSvId(academicSupervisorRequest.getAcademicSvId());
 		newAcademicSupervisorEntity.setAcademicSvName(academicSupervisorRequest.getAcademicSvName());
 		newAcademicSupervisorEntity.setAcademicSvPhone(academicSupervisorRequest.getAcademicSvPhone());
 		newAcademicSupervisorEntity.setAcademicSvEmail(academicSupervisorRequest.getAcademicSvEmail());

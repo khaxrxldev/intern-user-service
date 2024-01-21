@@ -441,15 +441,21 @@ public class UserController {
 		Map<Object, Object> object_map = new HashMap<Object, Object>();
 		
 		if (BaseUtility.isObjectNotNull(studentRequest)) {
-			StudentResponse studentResponse = userService.insertStudent(studentRequest, cvFile, mtFile, clFile, coFile, slFile);
+			StudentResponse existingStudentResponse = userService.getStudentByStudentMatricNum(studentRequest.getStudentMatricNum());
 			
-			if (BaseUtility.isObjectNotNull(studentResponse)) {
-				message_status = true;
-				message_desc = "SUCCESS";
+			if (BaseUtility.isObjectNull(existingStudentResponse)) {
+				StudentResponse studentResponse = userService.insertStudent(studentRequest, cvFile, mtFile, clFile, coFile, slFile);
 				
-				object_map.put("student", studentResponse);
+				if (BaseUtility.isObjectNotNull(studentResponse)) {
+					message_status = true;
+					message_desc = "SUCCESS";
+					
+					object_map.put("student", studentResponse);
+				} else {
+					error_desc = "FAIL";
+				}
 			} else {
-				error_desc = "FAIL";
+				error_desc = "Student already registerd";
 			}
 		} else {
 			http_status = HttpStatus.BAD_REQUEST;
