@@ -35,7 +35,6 @@ import com.intern.user.service.entity.IndustrySupervisorEntity;
 import com.intern.user.service.entity.StudentEntity;
 import com.intern.user.service.entity.StudentEvaluationEntity;
 import com.intern.user.service.entity.StudentSemesterEntity;
-import com.intern.user.service.exception.DataNotFoundException;
 import com.intern.user.service.utility.BaseUtility;
 import com.intern.user.service.utility.DateUtility;
 
@@ -700,10 +699,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public StudentResponse getStudentByStudentMatricNum(String studentMatricNum) throws Exception {
-		StudentResponse studentResponse = new StudentResponse();
+		StudentResponse studentResponse = null;
 		StudentEntity existedStudentEntity = studentRepository.findByStudentMatricNum(studentMatricNum);
 
 		if (BaseUtility.isObjectNotNull(existedStudentEntity)) {
+			studentResponse = new StudentResponse();
+			
 			studentResponse.setStudentMatricNum(existedStudentEntity.getStudentMatricNum());
 			studentResponse.setStudentName(existedStudentEntity.getStudentName());
 			studentResponse.setStudentAddress(existedStudentEntity.getStudentAddress());
@@ -781,9 +782,9 @@ public class UserServiceImpl implements UserService {
 			studentResponse.setStudentSemesters(studentSemesterResponses);
 			
 			return studentResponse;
-		} else {
-			throw new DataNotFoundException("Data student with matric number: " + studentMatricNum + " not found.");
 		}
+		
+		return studentResponse;
 	}
 
 	@Override

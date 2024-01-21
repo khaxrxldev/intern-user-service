@@ -430,8 +430,8 @@ public class UserController {
 		return returnResponse(null, http_status, error_desc, message_status, message_desc, message_code, message_dev, object_map);
 	}
 	
-	@PostMapping("/student")
-	public ResponseEntity<Response> insertStudent(@RequestPart("studentRequest") StudentRequest studentRequest, @RequestParam(name = "cvFile", required = false) MultipartFile cvFile, @RequestParam(name = "mtFile", required = false) MultipartFile mtFile, @RequestParam(name = "clFile", required = false) MultipartFile clFile, @RequestParam(name = "coFile", required = false) MultipartFile coFile, @RequestParam(name = "slFile", required = false) MultipartFile slFile) throws Exception {
+	@PostMapping("/student/register")
+	public ResponseEntity<Response> registerStudent(@RequestPart("studentRequest") StudentRequest studentRequest, @RequestParam(name = "cvFile", required = false) MultipartFile cvFile, @RequestParam(name = "mtFile", required = false) MultipartFile mtFile, @RequestParam(name = "clFile", required = false) MultipartFile clFile, @RequestParam(name = "coFile", required = false) MultipartFile coFile, @RequestParam(name = "slFile", required = false) MultipartFile slFile) throws Exception {
 		HttpStatus http_status = HttpStatus.OK;
 		String error_desc = null;
 		Boolean message_status = false;
@@ -456,6 +456,35 @@ public class UserController {
 				}
 			} else {
 				error_desc = "Student already registerd";
+			}
+		} else {
+			http_status = HttpStatus.BAD_REQUEST;
+			error_desc = "FAIL";
+		}
+		
+		return returnResponse(null, http_status, error_desc, message_status, message_desc, message_code, message_dev, object_map);
+	}
+	
+	@PostMapping("/student")
+	public ResponseEntity<Response> insertStudent(@RequestPart("studentRequest") StudentRequest studentRequest, @RequestParam(name = "cvFile", required = false) MultipartFile cvFile, @RequestParam(name = "mtFile", required = false) MultipartFile mtFile, @RequestParam(name = "clFile", required = false) MultipartFile clFile, @RequestParam(name = "coFile", required = false) MultipartFile coFile, @RequestParam(name = "slFile", required = false) MultipartFile slFile) throws Exception {
+		HttpStatus http_status = HttpStatus.OK;
+		String error_desc = null;
+		Boolean message_status = false;
+		String message_desc = null;
+		String message_code = null;
+		String message_dev = null;
+		Map<Object, Object> object_map = new HashMap<Object, Object>();
+		
+		if (BaseUtility.isObjectNotNull(studentRequest)) {
+			StudentResponse studentResponse = userService.insertStudent(studentRequest, cvFile, mtFile, clFile, coFile, slFile);
+			
+			if (BaseUtility.isObjectNotNull(studentResponse)) {
+				message_status = true;
+				message_desc = "SUCCESS";
+				
+				object_map.put("student", studentResponse);
+			} else {
+				error_desc = "FAIL";
 			}
 		} else {
 			http_status = HttpStatus.BAD_REQUEST;
